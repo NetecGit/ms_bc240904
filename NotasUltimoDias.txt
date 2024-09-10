@@ -1,0 +1,110 @@
+
+
+docker network create springcloud
+docker network ls
+docker network rm <nombre>
+
+
+net stop mysql80
+
+docker run -p 3306:3306 --name mysql-server --network springcloud -e MYSQL_ROOT_PASSWORD=abcd_2357 -e MYSQL_DATABASE=pedidos mysql:latest
+
+docker stop mysql-server
+
+docker start mysql-server
+
+docker container ps
+
+docker ps
+
+mysql -uroot -pabcd_2357 -P3306 -hlocalhost
+
+
+cd micro-config
+gradlew build
+
+dir /s *.jar
+
+Dockerfile
+
+FROM openjdk:20-ea-17-jdk
+VOLUME /tmp
+EXPOSE 9102
+ADD ./build/libs/micro-config-0.0.1-SNAPSHOT.jar micro-config.jar
+ENTRYPOINT [ "java", "-jar", "micro-config.jar" ]
+
+
+docker build -t micro-config:v1 .
+
+docker run -p 9102:9102 --name micro-config --network springcloud -d micro-config:v1
+
+docker stop micro-config
+
+docker start micro-config 
+
+http://localhost:9102/micro-articulo/default
+
+
+application.properties
+
+spring.application.name=micro-config
+server.port=9102
+
+# Configuracion del repositorio local
+# spring.cloud.config.server.git.uri=file:///C:/Users/Netec/Desktop/configMS	
+
+spring.cloud.config.server.git.uri=https://github.com/NetecGit/config.git
+spring.cloud.config.server.git.timeout=10
+
+
+
+MICRO-EUREKA
+
+cd micro-eureka
+
+.\gradlew build
+
+
+FROM openjdk:20-ea-17-jdk
+VOLUME /tmp
+EXPOSE 9099
+ADD ./build/libs/micro-eureka-0.0.1-SNAPSHOT.jar micro-eureka.jar
+ENTRYPOINT [ "java", "-jar", "micro-eureka.jar" ]
+
+
+docker build -t micro-eureka:v1 .
+
+docker images
+
+docker run -p 9099:9099 --name micro-eureka --network springcloud -d micro-eureka:v1
+
+http://localhost:9099/
+
+
+Micro-Articulo
+
+
+FROM openjdk:20-ea-17-jdk
+VOLUME /tmp
+EXPOSE 9091
+ADD ./build/libs/micro-articulo-0.0.1-SNAPSHOT.jar micro-articulo.jar
+ENTRYPOINT [ "java", "-jar", "micro-articulo.jar" ]
+
+
+docker build -t micro-articulo:v1 .
+
+docker run -p 9091:9091 --name micro-articulo --network springcloud -d micro-articulo:v1
+
+
+http://localhost:9091/articulo  GET 
+
+
+{
+"nombre":"chocolate",
+"marca":"Suiza",
+"descripcion":"trufa relleno sabor nuez",
+"precio":98.99
+}
+
+
+
